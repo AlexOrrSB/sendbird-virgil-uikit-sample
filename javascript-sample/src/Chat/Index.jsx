@@ -13,28 +13,25 @@ import 'sendbird-uikit/dist/index.css';
 import ChannelPreview from './ChannelPreview';
 import Message from './Message';
 import getCustomPaginatedQuery from './CustomUserList';
+import { useE3 } from '../utils/e3';
 
-export default function Chat({ userId, theme, nickname, useCustomQuery }) {
+const Chat = ({ userId, theme, nickname, useCustomQuery, connect }) => {
+  const {
+    encryptMessage,
+    decryptMessage,
+    decryptMessages,
+    createGroup,
+  } = useE3({ userId });
+  
   const history = useHistory();
   useEffect(() => {
     if (!userId || !nickname) {
       history.push('/');
     }
-    // userId && initE3(userId);
   }, [userId, nickname, history]);
 
-  // const [e3, setE3] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
   const [currentChannelUrl, setCurrentChannelUrl] = useState(null);
-
-  // const initE3 = async (userId) => {
-  //   console.log('initializing e3');
-  //   try {
-  //     return await EThree.initialize(() => getVirgilToken(userId));
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
 
   return (
     <div style={{ height: '100vh' }}>
@@ -79,4 +76,6 @@ export default function Chat({ userId, theme, nickname, useCustomQuery }) {
       </SendBirdProvider>
     </div>
   );
-}
+};
+
+export default Chat;
