@@ -32,11 +32,6 @@ export const E3Provider = ({ children }) => {
     }
   };
 
-  const printe3 = async () => {
-    console.log('e3 print');
-    console.log(e3);
-  };
-
   const encryptMessage = async (channel, message) => {
     try {
       const group = await loadGroup(channel);

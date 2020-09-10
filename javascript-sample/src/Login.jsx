@@ -8,9 +8,8 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 
-import {
-  useHistory,
-} from "react-router-dom";
+import { useHistory } from 'react-router-dom';
+import { useSendbird } from './utils/sendbird';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -31,58 +30,71 @@ const useStyles = makeStyles((theme) => ({
 export default function SignIn({ onSubmit }) {
   const classes = useStyles();
   const history = useHistory();
+  const { getAccessToken } = useSendbird();
+
   return (
-    <Container component="main" maxWidth="xs">
+    <Container component='main' maxWidth='xs'>
       <CssBaseline />
       <div className={classes.paper}>
-        <Typography component="h1" variant="h5">
+        <Typography component='h1' variant='h5'>
           Login
         </Typography>
         <form
           className={classes.form}
-          onSubmit={e => {
+          onSubmit={(e) => {
             e.preventDefault();
-            onSubmit({
-              userId: e.target.userId.value,
-              nickname: e.target.nickname.value,
-              theme: e.target.theme.checked ? 'dark' : 'light',
-              useCustomQuery: e.target.useCustomQuery.checked,
+            console.log(e.target);
+            const { target } = e
+            getAccessToken(target.userId.value).then((accessToken) => {
+              onSubmit({
+                userId: target.userId.value,
+                accessToken,
+                nickname: target.nickname.value,
+                theme: target.theme.checked ? 'dark' : 'light',
+                useCustomQuery: target.useCustomQuery.checked,
+              });
+              history.push('/chat');
             });
-            history.push('/chat');
           }}
         >
           <TextField
-            variant="outlined"
-            margin="normal"
+            variant='outlined'
+            margin='normal'
             required
             fullWidth
-            id="userId"
-            label="User Id"
-            name="userId"
+            id='userId'
+            label='User Id'
+            name='userId'
             autoFocus
           />
           <TextField
-            variant="outlined"
-            margin="normal"
+            variant='outlined'
+            margin='normal'
             required
             fullWidth
-            name="nickname"
-            label="Nick Name"
-            id="nickname"
+            name='nickname'
+            label='Nick Name'
+            id='nickname'
           />
           <FormControlLabel
-            control={<Checkbox value="dark" color="primary" name="theme" />}
-            label="Apply dark theme"
+            control={<Checkbox value='dark' color='primary' name='theme' />}
+            label='Apply dark theme'
           />
           <FormControlLabel
-            control={<Checkbox value="customQuery" color="primary" name="useCustomQuery" />}
-            label="Use custom user list"
+            control={
+              <Checkbox
+                value='customQuery'
+                color='primary'
+                name='useCustomQuery'
+              />
+            }
+            label='Use custom user list'
           />
           <Button
-            type="submit"
+            type='submit'
             fullWidth
-            variant="contained"
-            color="primary"
+            variant='contained'
+            color='primary'
             className={classes.submit}
           >
             Start

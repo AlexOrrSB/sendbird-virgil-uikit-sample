@@ -7,6 +7,8 @@ import {
   ChannelList,
   Channel,
   ChannelSettings,
+  withSendBird,
+  sendBirdSelectors,
 } from 'sendbird-uikit';
 import 'sendbird-uikit/dist/index.css';
 
@@ -15,14 +17,21 @@ import Message from './Message';
 import getCustomPaginatedQuery from './CustomUserList';
 import { useE3 } from '../utils/e3';
 
-const Chat = ({ userId, theme, nickname, useCustomQuery, connect }) => {
+const Chat = ({
+  userId,
+  accessToken,
+  theme,
+  nickname,
+  useCustomQuery,
+  connect,
+}) => {
   const {
     encryptMessage,
     decryptMessage,
     decryptMessages,
     createGroup,
   } = useE3({ userId });
-  
+
   const history = useHistory();
   useEffect(() => {
     if (!userId || !nickname) {
@@ -39,6 +48,7 @@ const Chat = ({ userId, theme, nickname, useCustomQuery, connect }) => {
         appId={process.env.APP_ID}
         theme={theme}
         userId={userId}
+        accessToken={accessToken}
         nickname={nickname}
         userListQuery={useCustomQuery ? getCustomPaginatedQuery : null}
       >
@@ -77,5 +87,9 @@ const Chat = ({ userId, theme, nickname, useCustomQuery, connect }) => {
     </div>
   );
 };
+
+const ChatWithSendbird = withSendBird(Chat, (state) => {
+  return { sdk: () => sendBirdSelectors.getSdk(state) };
+});
 
 export default Chat;

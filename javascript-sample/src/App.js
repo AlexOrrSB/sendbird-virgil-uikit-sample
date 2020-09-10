@@ -19,6 +19,7 @@ function App() {
           <Route path="/chat">
             <Chat
               userId={config.userId}
+              accessToken={config.accessToken}
               nickname={config.nickname}
               theme={config.theme}
               useCustomQuery={config.useCustomQuery}

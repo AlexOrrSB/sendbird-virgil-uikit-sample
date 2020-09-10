@@ -4,12 +4,15 @@ import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import { E3Provider } from './utils/e3';
+import { SendbirdProvider } from './utils/sendbird';
 
 ReactDOM.render(
   <React.StrictMode>
-    <E3Provider>
-      <App />
-    </E3Provider>
+    <SendbirdProvider>
+      <E3Provider>
+        <App />
+      </E3Provider>
+    </SendbirdProvider>
   </React.StrictMode>,
   document.getElementById('root'),
 );
