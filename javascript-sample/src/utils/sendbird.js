@@ -14,6 +14,14 @@ export const SendbirdProvider = ({ children }) => {
     return accessToken;
   };
 
+  const createGroupsForChannels = () => {
+    // sdk.onb
+  };
+
+  const createGroup = () => {
+
+  };
+
   return (
     <sendbirdContext.Provider
       value={{
@@ -30,6 +38,7 @@ export const useSendbird = ({ sdk } = { sdk: null }) => {
   const { getAccessToken, setSdk } = useContext(sendbirdContext);
 
   useEffect(() => {
+    console.log(sdk)
     sdk && setSdk(sdk);
   }, [sdk]);
 

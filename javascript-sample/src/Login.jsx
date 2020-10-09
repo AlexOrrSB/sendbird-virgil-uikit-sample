@@ -43,7 +43,6 @@ export default function SignIn({ onSubmit }) {
           className={classes.form}
           onSubmit={(e) => {
             e.preventDefault();
-            console.log(e.target);
             const { target } = e
             getAccessToken(target.userId.value).then((accessToken) => {
               onSubmit({
