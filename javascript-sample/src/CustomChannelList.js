@@ -1,7 +1,11 @@
 import React from 'react';
 import { ChannelList, sendBirdSelectors, withSendBird } from 'sendbird-uikit';
+import { useE3 } from './utils/e3';
 
 const CustomChannelList = ({ sdk, setCurrentChannelUrl }) => {
+  const userId = sdk?.currentUser?.userId;
+  const { createGroup } = useE3({ userId });
+
   return (
     <ChannelList
       onChannelSelect={(channel) => {
@@ -15,7 +19,6 @@ const CustomChannelList = ({ sdk, setCurrentChannelUrl }) => {
         }
         const params = new sdk.GroupChannelParams();
         params.addUserIds(selectedUsers);
-        params.isDistinct = true;
         return params;
       }}
     ></ChannelList>

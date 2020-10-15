@@ -29,9 +29,7 @@ const Chat = ({ userId, accessToken, nickname, theme }) => {
       >
         <div className='sendbird-app__wrap'>
           <div className='sendbird-app__channellist-wrap'>
-            <CustomChannelList
-              setCurrentChannelUrl={setCurrentChannelUrl}
-            />
+            <CustomChannelList setCurrentChannelUrl={setCurrentChannelUrl} />
           </div>
           <div className='sendbird-app__conversation-wrap'>
             <Channel
