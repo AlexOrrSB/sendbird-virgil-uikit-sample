@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
-import { E3Provider } from './utils/e3';
 import { SendbirdProvider } from './utils/sendbird';
+import { E3Provider } from './utils/e3';
 
 ReactDOM.render(
   <React.StrictMode>

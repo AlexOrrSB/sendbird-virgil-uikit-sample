@@ -7,6 +7,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import Avatar from '@material-ui/core/Avatar';
 
 import { useHistory } from 'react-router-dom';
 import { useSendbird } from './utils/sendbird';
@@ -18,12 +19,41 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     alignItems: 'center',
   },
+  main: {
+    backgroundColor: 'white',
+    textAlign: 'center',
+  },
   form: {
     width: '100%', // Fix IE 11 issue.
     marginTop: theme.spacing(1),
   },
   submit: {
     margin: theme.spacing(3, 0, 2),
+    backgroundColor: '#6e5baa',
+    '&:hover': {
+      backgroundColor: '#825deb',
+    },
+  },
+  checkbox: {
+    '&.Mui-checked': {
+      color: '#825deb',
+    },
+  },
+  input: {
+    '& .Mui-focused': {
+      color: '#825deb',
+    },
+    '& .MuiOutlinedInput-root': {
+      '&.Mui-focused fieldset': {
+        borderColor: '#825deb',
+      },
+    },
+  },
+  avatar: {
+    marginTop: 20,
+    width: 127 / 2,
+    height: 150 / 2,
+    borderRadius: 0,
   },
 }));
 
@@ -33,24 +63,28 @@ export default function SignIn({ onSubmit }) {
   const { getAccessToken } = useSendbird();
 
   return (
-    <Container component='main' maxWidth='xs'>
+    <Container component='main' maxWidth='xs' className={classes.main}>
       <CssBaseline />
       <div className={classes.paper}>
+        <Avatar
+          alt='Sendbird Logo'
+          src='https://dxstmhyqfqr1o.cloudfront.net/symbol/Sendbird_Symbol_PNG/Sendbird_Symbol_RGB.png'
+          className={classes.avatar}
+        />
         <Typography component='h1' variant='h5'>
-          Login
+          Sendbird | UIKit Sample
         </Typography>
         <form
           className={classes.form}
           onSubmit={(e) => {
             e.preventDefault();
-            const { target } = e
+            const { target } = e;
             getAccessToken(target.userId.value).then((accessToken) => {
               onSubmit({
                 userId: target.userId.value,
                 accessToken,
                 nickname: target.nickname.value,
                 theme: target.theme.checked ? 'dark' : 'light',
-                useCustomQuery: target.useCustomQuery.checked,
               });
               history.push('/chat');
             });
@@ -64,6 +98,7 @@ export default function SignIn({ onSubmit }) {
             id='userId'
             label='User Id'
             name='userId'
+            className={classes.input}
             autoFocus
           />
           <TextField
@@ -74,20 +109,18 @@ export default function SignIn({ onSubmit }) {
             name='nickname'
             label='Nick Name'
             id='nickname'
-          />
-          <FormControlLabel
-            control={<Checkbox value='dark' color='primary' name='theme' />}
-            label='Apply dark theme'
+            className={classes.input}
           />
           <FormControlLabel
             control={
               <Checkbox
-                value='customQuery'
+                value='dark'
                 color='primary'
-                name='useCustomQuery'
+                name='theme'
+                className={classes.checkbox}
               />
             }
-            label='Use custom user list'
+            label='Apply dark theme'
           />
           <Button
             type='submit'
@@ -96,10 +129,13 @@ export default function SignIn({ onSubmit }) {
             color='primary'
             className={classes.submit}
           >
-            Start
+            Login
           </Button>
         </form>
       </div>
+      <Typography variant='body1'>
+        Start chatting on Sendbird by choosing your username and nickname.
+      </Typography>
     </Container>
   );
 }

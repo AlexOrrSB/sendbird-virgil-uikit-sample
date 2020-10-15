@@ -8,7 +8,7 @@ import {
 } from 'react-router-dom';
 
 import Login from './Login';
-import Chat from './Chat/Index';
+import Chat from './Chat';
 
 function App() {
   const [config, setconfig] = useState({});
@@ -22,7 +22,6 @@ function App() {
               accessToken={config.accessToken}
               nickname={config.nickname}
               theme={config.theme}
-              useCustomQuery={config.useCustomQuery}
             />
           </Route>
           <Route path="/">

@@ -38,7 +38,6 @@ export const useSendbird = ({ sdk } = { sdk: null }) => {
   const { getAccessToken, setSdk } = useContext(sendbirdContext);
 
   useEffect(() => {
-    console.log(sdk)
     sdk && setSdk(sdk);
   }, [sdk]);
 

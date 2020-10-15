@@ -8,7 +8,6 @@ export const E3Provider = ({ children }) => {
   const [userId, setUserId] = useState();
 
   useEffect(() => {
-    userId && console.log(userId);
     if (userId) {
       initE3(userId);
     }
