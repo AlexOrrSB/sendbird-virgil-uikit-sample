@@ -37,6 +37,7 @@ const Chat = ({ userId, accessToken, nickname, theme }) => {
               onChatHeaderActionClick={() => {
                 setShowSettings(true);
               }}
+              onBefore
             />
           </div>
         </div>

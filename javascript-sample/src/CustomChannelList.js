@@ -1,5 +1,6 @@
 import React from 'react';
 import { ChannelList, sendBirdSelectors, withSendBird } from 'sendbird-uikit';
+import cuid from 'cuid';
 import { useE3 } from './utils/e3';
 
 const CustomChannelList = ({ sdk, setCurrentChannelUrl }) => {
@@ -19,6 +20,10 @@ const CustomChannelList = ({ sdk, setCurrentChannelUrl }) => {
         }
         const params = new sdk.GroupChannelParams();
         params.addUserIds(selectedUsers);
+        const url = `custom_channel_${cuid()}`;
+        params.url = url;
+        params.data = userId;
+        createGroup(url, selectedUsers);
         return params;
       }}
     ></ChannelList>
