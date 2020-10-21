@@ -3,9 +3,10 @@ import React, { useEffect, useState } from 'react';
 import './Chat.css';
 
 import { useHistory } from 'react-router-dom';
-import { SendBirdProvider, Channel, ChannelSettings } from 'sendbird-uikit';
+import { SendBirdProvider, ChannelSettings } from 'sendbird-uikit';
 import 'sendbird-uikit/dist/index.css';
 
+import CustomChannel from './CustomChannel';
 import CustomChannelList from './CustomChannelList';
 
 const Chat = ({ userId, accessToken, nickname, theme }) => {
@@ -16,7 +17,7 @@ const Chat = ({ userId, accessToken, nickname, theme }) => {
     }
   }, [userId, nickname, history]);
   const [showSettings, setShowSettings] = useState(false);
-  const [currentChannelUrl, setCurrentChannelUrl] = useState(null);
+  const [currentChannel, setCurrentChannel] = useState(null);
 
   return (
     <div style={{ height: '100vh' }}>
@@ -29,22 +30,19 @@ const Chat = ({ userId, accessToken, nickname, theme }) => {
       >
         <div className='sendbird-app__wrap'>
           <div className='sendbird-app__channellist-wrap'>
-            <CustomChannelList setCurrentChannelUrl={setCurrentChannelUrl} />
+            <CustomChannelList setCurrentChannel={setCurrentChannel} />
           </div>
           <div className='sendbird-app__conversation-wrap'>
-            <Channel
-              channelUrl={currentChannelUrl}
-              onChatHeaderActionClick={() => {
-                setShowSettings(true);
-              }}
-              onBefore
-            />
+            <CustomChannel
+              currentChannel={currentChannel}
+              setShowSettings={setShowSettings}
+            ></CustomChannel>
           </div>
         </div>
         {showSettings && (
           <div className='sendbird-app__settingspanel-wrap'>
             <ChannelSettings
-              channelUrl={currentChannelUrl}
+              channelUrl={currentChannel?.url}
               onCloseClick={() => {
                 setShowSettings(false);
               }}
