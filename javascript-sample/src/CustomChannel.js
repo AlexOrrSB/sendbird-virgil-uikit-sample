@@ -12,31 +12,6 @@ const CustomChannel = ({ sdk, currentChannel, setShowSettings }) => {
     setShowSettings(true);
   };
 
-  // const cacheDecryptedMessage = (message) => {
-  //   const messageId = message.messageId;
-  //   let decryptedMessage = decryptedMessages[messageId];
-  //   if (!decryptedMessage) {
-  //     setTimeout(() => {
-  //       let tempDecyptedMessages = {};
-  //       tempDecyptedMessages[messageId] = 'DECRYPTED MESSAGE';
-  //       setDecryptedMessages({ ...decryptedMessages, ...tempDecyptedMessages });
-  //     }, 1000);
-  //     // decryptMessages(currentChannel, [message]).then(
-  //     //   (decryptedMessagesResult) => {
-  //     //     decryptedMessage = decryptedMessagesResult.pop();
-  //     //     if (decryptedMessage) {
-  //     //       const tempDecryptedMessages = {};
-  //     //       tempDecryptedMessages[messageId] = decryptedMessage;
-  //     //       setDecryptedMessages({
-  //     //         ...decryptedMessages,
-  //     //         ...tempDecryptedMessages,
-  //     //       });
-  //     //     }
-  //     //   },
-  //     // );
-  //   }
-  // };
-
   return (
     <Channel
       channelUrl={currentChannel?.url}
