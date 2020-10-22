@@ -52,9 +52,10 @@ export const E3Provider = ({ children }) => {
     try {
       if (message.messageType === 'user') {
         const senderCart = await e3.findUsers(message.sender.userId);
-        message.message = await group.decrypt(message.message, senderCart);
+        const decryptedMessage = await group.decrypt(message.message, senderCart);
+        return decryptedMessage;
       }
-      return message;
+      return
     } catch (error) {
       console.error(error);
     }
@@ -101,7 +102,6 @@ export const E3Provider = ({ children }) => {
       value={{
         setUserId,
         encryptMessage,
-        decryptMessage,
         decryptMessages,
         createGroup,
       }}
@@ -115,7 +115,6 @@ export const useE3 = ({ userId }) => {
   const {
     setUserId,
     encryptMessage,
-    decryptMessage,
     decryptMessages,
     createGroup,
   } = useContext(e3Context);
@@ -126,7 +125,6 @@ export const useE3 = ({ userId }) => {
 
   return {
     encryptMessage,
-    decryptMessage,
     decryptMessages,
     createGroup,
   };

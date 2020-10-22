@@ -65,9 +65,9 @@ function CustomMessageInput({
 
   const sendUserMessage_ = (event) => {
     encryptMessage(channel, inputText).then((encryptedMessage) => {
-      console.log(`Encrypted Message: ${encryptedMessage}`)
       const params = new sdk.UserMessageParams();
       params.message = encryptedMessage;
+      params.data = inputText
       sendUserMessage(channel.url, params)
         .then((message) => {
           console.log(message);
