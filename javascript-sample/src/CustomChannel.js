@@ -6,7 +6,7 @@ import { useE3 } from './utils/e3';
 
 const CustomChannel = ({ sdk, currentChannel, setShowSettings }) => {
   const userId = sdk?.currentUser?.userId;
-  const { isInitialized, encryptMessage, decryptMessages } = useE3({ userId });
+  const { isInitialized, encryptMessage, decryptMessage } = useE3({ userId });
 
   const onChatHeaderActionClick = () => {
     setShowSettings(true);
@@ -23,8 +23,8 @@ const CustomChannel = ({ sdk, currentChannel, setShowSettings }) => {
               message={message}
               onDeleteMessage={onDeleteMessage}
               onUpdateMessage={onUpdateMessage}
-              decryptMessages={(message) =>
-                decryptMessages(currentChannel, [message])
+              decryptMessage={(message) =>
+                decryptMessage(currentChannel, message)
               }
             ></CustomMessage>
           );

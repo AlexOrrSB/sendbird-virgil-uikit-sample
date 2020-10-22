@@ -11,7 +11,7 @@ import Link from '@material-ui/core/Link';
 
 const CustomMessage = ({
   message,
-  decryptMessages,
+  decryptMessage,
   onDeleteMessage,
   onUpdateMessage,
 }) => {
@@ -20,8 +20,7 @@ const CustomMessage = ({
   if (message.message && message.data) {
     const data = JSON.parse(message.data);
     if (data.isEncrypted) {
-      decryptMessages(message).then((decryptedMessages) => {
-        const decryptedMessage = decryptedMessages.pop();
+      decryptMessage(message).then((decryptedMessage) => {
         if (decryptedMessage) {
           setDecryptedMessage(decryptedMessage);
         }

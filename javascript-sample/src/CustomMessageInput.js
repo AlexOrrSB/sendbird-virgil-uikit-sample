@@ -53,7 +53,6 @@ function CustomMessageInput({
 
       sendFileMessage(channel.url, params)
         .then((message) => {
-          console.log(message);
           event.target.value = '';
         })
         .catch((error) => {
@@ -69,7 +68,6 @@ function CustomMessageInput({
       params.data = JSON.stringify({ isEncrypted: true });
       sendUserMessage(channel.url, params)
         .then((message) => {
-          console.log(message);
           setInputText('');
         })
         .catch((error) => {

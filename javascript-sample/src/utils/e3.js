@@ -5,7 +5,7 @@ const e3Context = createContext();
 
 export const E3Provider = ({ children }) => {
   const [e3, setE3] = useState();
-  const [isInitialized, setIsInitialized] = useState(false)
+  const [isInitialized, setIsInitialized] = useState(false);
   const [userId, setUserId] = useState();
 
   useEffect(() => {
@@ -27,7 +27,7 @@ export const E3Provider = ({ children }) => {
     try {
       const e3 = await EThree.initialize(() => getVirgilToken(userId));
       setE3(e3);
-      setIsInitialized(true)
+      setIsInitialized(true);
     } catch (error) {
       console.error(error);
     }
@@ -50,17 +50,25 @@ export const E3Provider = ({ children }) => {
     }
   };
 
-  const decryptMessage = async (message, group) => {
+  const _decryptMessage = async (message, group) => {
     try {
       if (message.messageType === 'user' && message.sender) {
         const senderCart = await e3.findUsers(message.sender.userId);
-        const decryptedMessage = await group.decrypt(message.message, senderCart);
+        const decryptedMessage = await group.decrypt(
+          message.message,
+          senderCart,
+        );
         return decryptedMessage;
       }
-      return
+      return;
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const decryptMessage = async (channel, message) => {
+    const decryptedMessages = await decryptMessages(channel, [message]);
+    return decryptedMessages.pop();
   };
 
   const decryptMessages = async (channel, messages) => {
@@ -68,7 +76,7 @@ export const E3Provider = ({ children }) => {
       const group = await loadGroup(channel);
 
       const decryptedMessagesPromises = messages.map((message) => {
-        return decryptMessage(message, group).then((decryptedMessage) => {
+        return _decryptMessage(message, group).then((decryptedMessage) => {
           return decryptedMessage;
         });
       });
@@ -84,6 +92,8 @@ export const E3Provider = ({ children }) => {
       const participants = await e3.findUsers(participantIdentities);
       await e3.createGroup(groupId, participants);
     } catch (error) {
+      if (error) {
+      }
       console.error(error);
     }
   };
@@ -91,7 +101,6 @@ export const E3Provider = ({ children }) => {
   const loadGroup = async (channel) => {
     try {
       const { ownerId, groupId } = JSON.parse(channel.data);
-      console.log(ownerId, groupId)
       const ownerCard = await e3.findUsers(ownerId);
       return await e3.loadGroup(groupId, ownerCard);
     } catch (error) {
@@ -105,6 +114,7 @@ export const E3Provider = ({ children }) => {
         isInitialized,
         setUserId,
         encryptMessage,
+        decryptMessage,
         decryptMessages,
         createGroup,
       }}
@@ -119,6 +129,7 @@ export const useE3 = ({ userId }) => {
     isInitialized,
     setUserId,
     encryptMessage,
+    decryptMessage,
     decryptMessages,
     createGroup,
   } = useContext(e3Context);
@@ -130,6 +141,7 @@ export const useE3 = ({ userId }) => {
   return {
     isInitialized,
     encryptMessage,
+    decryptMessage,
     decryptMessages,
     createGroup,
   };
