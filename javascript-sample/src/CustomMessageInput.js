@@ -12,7 +12,6 @@ import {
   Send as SendIcon,
 } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
-import { useE3 } from './utils/e3';
 
 const useStyles = makeStyles({
   input: {
@@ -67,7 +66,7 @@ function CustomMessageInput({
     encryptMessage(channel, inputText).then((encryptedMessage) => {
       const params = new sdk.UserMessageParams();
       params.message = encryptedMessage;
-      params.data = inputText
+      params.data = JSON.stringify({ isEncrypted: true });
       sendUserMessage(channel.url, params)
         .then((message) => {
           console.log(message);

@@ -5,6 +5,7 @@ const e3Context = createContext();
 
 export const E3Provider = ({ children }) => {
   const [e3, setE3] = useState();
+  const [isInitialized, setIsInitialized] = useState(false)
   const [userId, setUserId] = useState();
 
   useEffect(() => {
@@ -26,6 +27,7 @@ export const E3Provider = ({ children }) => {
     try {
       const e3 = await EThree.initialize(() => getVirgilToken(userId));
       setE3(e3);
+      setIsInitialized(true)
     } catch (error) {
       console.error(error);
     }
@@ -50,7 +52,7 @@ export const E3Provider = ({ children }) => {
 
   const decryptMessage = async (message, group) => {
     try {
-      if (message.messageType === 'user') {
+      if (message.messageType === 'user' && message.sender) {
         const senderCart = await e3.findUsers(message.sender.userId);
         const decryptedMessage = await group.decrypt(message.message, senderCart);
         return decryptedMessage;
@@ -100,6 +102,7 @@ export const E3Provider = ({ children }) => {
   return (
     <e3Context.Provider
       value={{
+        isInitialized,
         setUserId,
         encryptMessage,
         decryptMessages,
@@ -113,6 +116,7 @@ export const E3Provider = ({ children }) => {
 
 export const useE3 = ({ userId }) => {
   const {
+    isInitialized,
     setUserId,
     encryptMessage,
     decryptMessages,
@@ -124,6 +128,7 @@ export const useE3 = ({ userId }) => {
   }, [userId]);
 
   return {
+    isInitialized,
     encryptMessage,
     decryptMessages,
     createGroup,

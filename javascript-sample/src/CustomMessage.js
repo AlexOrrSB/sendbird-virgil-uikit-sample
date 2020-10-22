@@ -17,13 +17,16 @@ const CustomMessage = ({
 }) => {
   const [decryptedMessage, setDecryptedMessage] = useState('');
 
-  if (message.message) {
-    decryptMessages(message).then((decryptedMessages) => {
-      const decryptedMessage = decryptedMessages.pop();
-      if (decryptedMessage) {
-        setDecryptedMessage(decryptedMessage);
-      }
-    });
+  if (message.message && message.data) {
+    const data = JSON.parse(message.data);
+    if (data.isEncrypted) {
+      decryptMessages(message).then((decryptedMessages) => {
+        const decryptedMessage = decryptedMessages.pop();
+        if (decryptedMessage) {
+          setDecryptedMessage(decryptedMessage);
+        }
+      });
+    }
   }
 
   return (
