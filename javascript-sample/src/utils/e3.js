@@ -33,14 +33,6 @@ export const E3Provider = ({ children }) => {
     }
   };
 
-  const registerUser = async () => {
-    try {
-      e3.registerUser();
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   const encryptMessage = async (channel, message) => {
     try {
       const group = await loadGroup(channel);

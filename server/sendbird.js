@@ -18,20 +18,6 @@ const getUser = async (userId) => {
   return await response.json();
 };
 
-const createUser = async (userId, nickname) => {
-  const response = await fetch(`${sendbirdBaseUrl}/v3/users`, {
-    method: 'POST',
-    headers,
-    body: {
-      user_id: userId,
-      nickname,
-      profile_url: '',
-      issue_access_token: true,
-    },
-  });
-
-  return await response.json();
-};
 
 sendbirdRouter.get('/accessToken/:userId', async (req, res) => {
   try {
@@ -46,4 +32,4 @@ sendbirdRouter.get('/accessToken/:userId', async (req, res) => {
   }
 });
 
-module.exports = { sendbirdRouter, createUser, getUser };
+module.exports = { sendbirdRouter, getUser };

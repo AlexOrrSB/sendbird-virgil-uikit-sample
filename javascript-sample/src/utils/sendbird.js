@@ -3,8 +3,6 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 const sendbirdContext = createContext();
 
 export const SendbirdProvider = ({ children }) => {
-  const [sdk, setSdk] = useState();
-
   const getAccessToken = async (userId) => {
     const response = await fetch(
       `${process.env.REACT_APP_API_BASE_URL}/sendbird/accessToken/${userId}`,
@@ -14,19 +12,10 @@ export const SendbirdProvider = ({ children }) => {
     return accessToken;
   };
 
-  const createGroupsForChannels = () => {
-    // sdk.onb
-  };
-
-  const createGroup = () => {
-
-  };
-
   return (
     <sendbirdContext.Provider
       value={{
         getAccessToken,
-        setSdk,
       }}
     >
       {children}
@@ -34,12 +23,8 @@ export const SendbirdProvider = ({ children }) => {
   );
 };
 
-export const useSendbird = ({ sdk } = { sdk: null }) => {
-  const { getAccessToken, setSdk } = useContext(sendbirdContext);
-
-  useEffect(() => {
-    sdk && setSdk(sdk);
-  }, [sdk]);
+export const useSendbird = () => {
+  const { getAccessToken } = useContext(sendbirdContext);
 
   return {
     getAccessToken,
