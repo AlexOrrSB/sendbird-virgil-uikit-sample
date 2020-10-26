@@ -9,7 +9,6 @@ According to Virgil's website:
 > - **Independent data protection**: With E3Kit your data protection doesn't rely on any network and service providers, so any attacks on them won't influence the data integrity and confidentiality.
 > - **Data integrity**: The E3Kit signs and verifies data as part of the encrypt and decrypt functions. This confirms that data is actually coming from the user who encrypted it and that it hasn't been tampered with in transit or storage.
 
-<!-- TODO: Update links -->
 
 ## Examples
 
@@ -20,6 +19,10 @@ According to Virgil's website:
 ### Create a Sendbird Application
 
 [Sign up](https://dashboard.sendbird.com/auth/signup) for a free Sendbird account and create a new chat application.
+
+### Create users in the Sendbird dashboard
+
+Create users in the Sendbird dashboard in the `users` section. Issue the new user's an access token so that they can only connect the Sendbird client SDK if they first retrieve the access token. This is a best practice and although unsecured in this tutorial, the endpoint to retrieve the Sendbird access token can be behind your own application's authentication.
 
 ### Create a Virgil Account
 
@@ -38,7 +41,6 @@ Add your `SENDBIRD_APP_ID`, `SENDBIRD_API_TOKEN`, `VIRGIL_APP_ID`, `VIRGIL_APP_K
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const { usersRouter } = require('./users');
 const { virgilRouter } = require('./virgil');
 const { sendbirdRouter } = require('./sendbird');
 
@@ -47,7 +49,6 @@ const port = 6789;
 
 app.use(cors());
 
-app.use('/users', usersRouter);
 app.use('/virgil', virgilRouter);
 app.use('/sendbird', sendbirdRouter);
 
@@ -61,6 +62,8 @@ app.listen(port, () =>
 Provide users a [Virgil JWT](https://developer.virgilsecurity.com/docs/e3kit/get-started/generate-client-tokens/) and [Sendbird access/session token](https://docs.sendbird.com/platform/user#3_create_a_user_4_access_token_vs_session_token) from your backend.
 
 In a production application this request should require authentication.
+
+We will have an endpoint to get a Sendbird user's accessToken to authenticate with the Sendbird SDK.
 
 ```
 // server/sendbird.js
@@ -99,6 +102,8 @@ sendbirdRouter.get('/accessToken/:userId', async (req, res) => {
 
 module.exports = { sendbirdRouter, getUser };
 ```
+
+We also need to get a JWT for Virgil user's in order to initialize the client side SDK.
 
 ```
 // server/virgil.js
@@ -145,7 +150,7 @@ module.exports = { virgilRouter };
 
 #### JavaScript
 
-Start with [a Sendbird JavaScript sample app](https://github.com/sendbird/SendBird-JavaScript). We're going to use the [Sendbird JavaScript UIkit Custom Sample](https://github.com/sendbird/SendBird-JavaScript/tree/master/uikit-samples/custom-react-app) as a starting point. This gives us a start app with some custom components we can quickly modify.
+Start with [a Sendbird JavaScript sample app](https://github.com/sendbird/SendBird-JavaScript). We're going to use the [Sendbird JavaScript UIkit Custom Sample](https://github.com/sendbird/SendBird-JavaScript/tree/master/uikit-samples/custom-react-app) as a starting point. This gives us a starter app with some custom components we can quickly modify.
 
 #### iOS
 
@@ -160,6 +165,8 @@ Start with [a Sendbird Android sample app](https://github.com/sendbird/SendBird-
 Follow the directions in the [Virgil documentation](https://developer.virgilsecurity.com/docs/e3kit/get-started/setup-client/#install-e3kit)
 
 #### JavaScript
+
+We need to add Virgil's e3kit-browser SDK. You can use yarn or npm.
 
 ```
 yarn add @virgilsecurity/e3kit-browser
@@ -177,7 +184,7 @@ Follow the steps in the [Virgil documentation](https://developer.virgilsecurity.
 
 #### JavaScript
 
-For easy access we will create a hook for all the Virgil functionality
+For convenience we will create a hook for all the Virgil functionality. This way we can initialize the Virgil SDK once when the user connects, and then use helper functions to easily perform Vigil actions from our chat components.
 
 ```
 // javascript-sample/src/utils/e3.js
@@ -243,7 +250,8 @@ export const useE3 = ({ userId }) => {
 };
 ```
 
-Let's add the Virgil provider to our app
+Let's add the Virgil provider to our app. This makes our Virgil hook accessible anywhere in our chat application.
+
 ```
 // javascript-sample/src/index.js
 
@@ -281,16 +289,39 @@ To support encrypted messaging you will need to be able to handle a few steps:
 
 - Register new users with both Sendbird and Virgil Cloud
 - Create a Sendbird Group Channel and a corresponding Virgil Group Chat
-- Load a Sendbird Group Channel, and the corresponding Virgil Group Chat to load and decrypt its messages
 - Encrypt and send a message
-- Receive and decrypt messages from other members of the Group Channel
+- Load a Sendbird Group Channel, and the corresponding Virgil Group Chat to load and decrypt its messages
 
-### Create a new Sendbird group channel and Virgil Group Chat
+### Register a user with Virgil on signup
+
+When a user is created with Sendbird a client needs to register with Virgil. This only needs to be done on user signup. After a user is registered they will be able to use Virgil on that device as long as the user's private key stays stored on the device. If it is lost or access is needed on another device it is best to use key backup and recovery which is outside the scope of this tutorial.
+
+#### JavaScript
+
+Since we are creating our Sendbird users using the dashboard there is not a client side user registration flow to trigger this action. If you have a signup flow, it is best to register a user then. For simplicity you can simply create a button to manually call this method for any users that haven't been registered with Virgil. All users will need to be registered with Virgil before they can be added to group channels, send messages, or read messages. 
 
 ```
 // javascript-sample/src/utils/e3.js
 
-export const createGroup = async (groupId, participantIdentities) => {
+const registerUser = async () => {
+  try {
+    e3.register()
+  } catch (error) {
+    console.error(error)
+  }
+}
+```
+
+### Create a new Sendbird group channel and Virgil Group Chat
+
+When a Sendbird group channel is created we need to create a corresponding Virgil group. Virgil groups have an owner whose ID is required to load the channel. We store this ID in the data field of the Sendbrd group channel so that non-owner channel members can load the channel later. Virgil handles making sure that messages can only be decrypted by group members.
+
+#### JavaScript
+
+```
+// javascript-sample/src/utils/e3.js
+
+const createGroup = async (groupId, participantIdentities) => {
   try {
     const participants = await e3.findUsers(participantIdentities);
     await e3.createGroup(groupId, participants);
@@ -298,106 +329,77 @@ export const createGroup = async (groupId, participantIdentities) => {
     console.error(error);
   }
 };
-```
 
-```
-// client/lib/sendbird.js
-
-export const createChannel = async (
-  state,
-  dispatch,
-  { channelName, userIds },
-) => {
-  const sb = Sendbird.getInstance();
-  const { currentUser } = state;
-
-  const groupChannelParams = new sb.GroupChannelParams();
-  groupChannelParams.name = channelName;
-  groupChannelParams.addUserIds(userIds.replace(' ', '').split(','));
-  groupChannelParams.data = currentUser.userId;
-
-  sb.GroupChannel.createChannel(groupChannelParams, async (channel, error) => {
-    dispatch({ type: actionTypes.ADD_GROUP_CHANNEL, payload: { channel } });
-    selectChannel(state, dispatch, { channel });
-    await createGroup(channel.url, userIds);
-  });
-};
-```
-
-### Load an existing Sendbird group channel and Virgil Group Chat
-
-```
-// client/lib/e3.js
-
-export const decryptMessages = async (channel, messages) => {
+const loadGroup = async (channel) => {
   try {
-    const group = await loadGroup(channel);
-
-    const decryptedMessagesPromises = messages.map((message) => {
-      return decryptMessage(message, group).then((decryptedMessage) => {
-        return decryptedMessage;
-      });
-    });
-
-    return Promise.all(decryptedMessagesPromises);
+    const { ownerId, groupId } = JSON.parse(channel.data);
+    const ownerCard = await e3.findUsers(ownerId);
+    return await e3.loadGroup(groupId, ownerCard);
   } catch (error) {
     console.error(error);
-  }
-};
-
-export const decryptMessage = async (message, group) => {
-  try {
-    if (message.messageType === 'user') {
-      const senderCart = await e3.findUsers(message.sender.userId);
-      message.message = await group.decrypt(message.message, senderCart);
     }
-    return message;
-  } catch (error) {
-    console.error(error);
-  }
 };
 ```
 
 ```
-// client/lib/sendbird.js
+// javascript-sample/src/CustomChannelList.js
 
-export const selectChannel = async (state, dispatch, { channel }) => {
-  const { selectedChannel } = state;
+import React from 'react';
+import { ChannelList, sendBirdSelectors, withSendBird } from 'sendbird-uikit';
+import cuid from 'cuid';
+import { useE3 } from './utils/e3';
 
-  dispatch({
-    type: actionTypes.SELECT_CHANNEL,
-    payload: { selectedChannel: channel },
-  });
+const CustomChannelList = ({ sdk, setCurrentChannel }) => {
+  const userId = sdk?.currentUser?.userId;
+  const { createGroup } = useE3({ userId });
 
-  if (channel) {
-    if (channel.url === selectedChannel.url) {
-      return;
-    }
-    addChannelHandler(state, dispatch);
-    const previousMessageListQuery = channel.createPreviousMessageListQuery();
-    dispatch({
-      type: actionTypes.SET_MESSAGE_LIST_QUERY,
-      payload: { messageListQuery: previousMessageListQuery },
-    });
-    previousMessageListQuery.load(async (messages, error) => {
-      if (!error) {
-        const decryptedMessages = await decryptMessages(channel, messages);
-        dispatch({
-          type: actionTypes.ADD_MESSAGES,
-          payload: { messages: decryptedMessages },
-        });
-      }
-    });
-  }
+  return (
+    <ChannelList
+      onChannelSelect={(channel) => {
+        if (channel && channel.url) {
+          setCurrentChannel(channel);
+        }
+      }}
+      onBeforeCreateChannel={(selectedUsers) => {
+        if (!sdk || !sdk.GroupChannelParams) {
+          return;
+        }
+        const params = new sdk.GroupChannelParams();
+        params.addUserIds(selectedUsers);
+        const groupId = cuid();
+        params.data = JSON.stringify({ ownerId: userId, groupId });
+        const identites = [userId, ...selectedUsers];
+        createGroup(groupId, identites);
+        return params;
+      }}
+    ></ChannelList>
+  );
 };
+
+const mapSendbirdStateToProps = (state) => {
+  return {
+    sdk: sendBirdSelectors.getSdk(state),
+  };
+};
+
+const CustomChannelListWithSendbird = withSendBird(
+  CustomChannelList,
+  mapSendbirdStateToProps,
+);
+
+export default CustomChannelListWithSendbird;
 ```
 
 ### Send a message
 
-Messages need to be encrypted prior to sending them to the Sendbird Group Channel. Use these methods to take a Sendbird channel and message and return the encrypted message to your chat component for sending.
+Messages need to be encrypted prior to sending them to the Sendbird Group Channel. When a user sends a message we encrypt the message and then send the message using the Sendbird SDK. This example is for text messages, but Virgil also supports encrypted files. We are going to mark messages we send as encrypted, using the data field, so that we only try to decrypt messages that require us to do so.
+
+#### Javascript
+
+We will add some helpers to our Virgil hook to support encrypting messages. Since we are using group encryption we also need to load the group.
 
 ```
-// client/lib/e3.js
+// javascript-sample/src/utils/e3.js
 
 export const encryptMessage = async (channel, message) => {
   try {
@@ -417,73 +419,315 @@ const loadGroup = async (channel) => {
   }
 };
 ```
+We will add a custom message input in our channel component so that we can first encrypt the message prior to sending. We will do this with the renderMessageInput prop of our CustomChannel component and a CustomMessageInput component.
 
 ```
-// client/lib/sendbird.js
+// javascript-sample/src/CustomChannel.js
 
-export const sendMessage = async (state, dispatch, { message }) => {
-  const { selectedChannel } = state;
+...
+const CustomChannel = ({ sdk, currentChannel, setShowSettings }) => {
+  const userId = sdk?.currentUser?.userId;
+  const { encryptMessage, decryptMessage } = useE3({ userId });
 
-  const sb = Sendbird.getInstance();
-  const encryptedMessage = await encryptMessage(selectedChannel, message);
-  const messageParams = new sb.UserMessageParams();
-  messageParams.message = encryptedMessage;
-  selectedChannel.sendUserMessage(messageParams, (sentMessage, error) => {
-    if (!error) {
-      sentMessage.message = message;
-      dispatch({
-        type: actionTypes.ADD_MESSAGE,
-        payload: { message: sentMessage },
-      });
-    } else {
+  ...
+
+  return (
+        <Channel
+          channelUrl={currentChannel?.url}
+          onChatHeaderActionClick={onChatHeaderActionClick}
+          renderMessageInput={({ channel, user, disabled }) => (
+            <CustomMessageInput
+              channel={channel}
+              disabled={disabled}
+              encryptMessage={encryptMessage}
+            />
+          )}
+        />
+      );
+
+  ...
+```
+The CustomMesssageInput component will encrypt text messages prior to sending them.
+
+```
+// javascript-sample/src/CustomMessageInput.js
+
+import React, { useState } from 'react';
+import { sendBirdSelectors, withSendBird } from 'sendbird-uikit';
+import {
+  InputAdornment,
+  IconButton,
+  FormControl,
+  InputLabel,
+  OutlinedInput,
+} from '@material-ui/core';
+import {
+  AttachFile as AttachFileIcon,
+  Send as SendIcon,
+} from '@material-ui/icons';
+import { makeStyles } from '@material-ui/styles';
+
+const useStyles = makeStyles({
+  input: {
+    display: 'none',
+  },
+});
+
+function CustomMessageInput({
+  channel,
+  encryptMessage,
+  disabled,
+  sendUserMessage,
+  sendFileMessage,
+  sdk,
+}) {
+  const classes = useStyles();
+
+  // state
+  const [inputText, setInputText] = useState('');
+  const isInputEmpty = inputText.length < 1;
+
+  // event handler
+  const handleChange = (event) => {
+    setInputText(event.target.value);
+  };
+  
+  ...
+
+  const sendUserMessage_ = (event) => {
+    encryptMessage(channel, inputText).then((encryptedMessage) => {
+      const params = new sdk.UserMessageParams();
+      params.message = encryptedMessage;
+      params.data = JSON.stringify({ isEncrypted: true });
+      sendUserMessage(channel.url, params)
+        .then((message) => {
+          setInputText('');
+        })
+        .catch((error) => {
+          console.log(error.message);
+        });
+    });
+  };
+
+  return (
+    <div className='customized-message-input'>
+      <FormControl variant='outlined' disabled={disabled} fullWidth>
+        <InputLabel htmlFor='customized-message-input'>User Message</InputLabel>
+        <OutlinedInput
+          id='customized-message-input'
+          type='txt'
+          value={inputText}
+          onChange={handleChange}
+          labelWidth={105}
+          multiline
+          endAdornment={
+            <InputAdornment position='end'>
+              {isInputEmpty ? (
+                ...
+              ) : (
+                <IconButton disabled={disabled} onClick={sendUserMessage_}>
+                  <SendIcon color={disabled ? 'disabled' : 'primary'} />
+                </IconButton>
+              )}
+            </InputAdornment>
+          }
+        />
+      </FormControl>
+    </div>
+  );
+}
+
+const mapStoreToProps = (store) => {
+  const sendUserMessage = sendBirdSelectors.getSendUserMessage(store);
+  const sdk = sendBirdSelectors.getSdk(store);
+  const sendFileMessage = sendBirdSelectors.getSendFileMessage(store);
+  return {
+    sendUserMessage,
+    sdk,
+    sendFileMessage,
+  };
+};
+
+export default withSendBird(CustomMessageInput, mapStoreToProps);
+```
+
+### Decrypt messages in an existing group channel
+
+Members of a channel need to decrypt messages before they can read them. Virgil's group encryption will handle this if the user is part of the Virgil Group. 
+
+#### JavaScript
+
+We can add some more helper functions to our Virgil hook for decrypting messages
+
+```
+// javascript-sample/src/utils/e3.js
+
+const _decryptMessage = async (message, group) => {
+    try {
+      if (message.messageType === 'user' && message.sender) {
+        const senderCart = await e3.findUsers(message.sender.userId);
+        const decryptedMessage = await group.decrypt(
+          message.message,
+          senderCart,
+        );
+        return decryptedMessage;
+      }
+      return;
+    } catch (error) {
       console.error(error);
     }
-  });
-};
-```
+  };
 
-### Receive a message
+  const decryptMessage = async (channel, message) => {
+    const decryptedMessages = await decryptMessages(channel, [message]);
+    return decryptedMessages.pop();
+  };
 
-Messages will be received by listening for an `onMessageReceived` event in the Sendbird channel handler. The message will arrive encrypted and needs to be decrypted before adding it to the message list.
+  const decryptMessages = async (channel, messages) => {
+    try {
+      const group = await loadGroup(channel);
 
-Use the same decrypt method you used when decrypting messages loaded with the channel
+      const decryptedMessagesPromises = messages.map((message) => {
+        return _decryptMessage(message, group).then((decryptedMessage) => {
+          return decryptedMessage;
+        });
+      });
 
-```
-// client/lib/e3.js
-
-export const decryptMessage = async (message, group) => {
-  try {
-    if (message.messageType === 'user') {
-      const senderCart = await e3.findUsers(message.sender.userId);
-      message.message = await group.decrypt(message.message, senderCart);
+      return Promise.all(decryptedMessagesPromises);
+    } catch (error) {
+      console.error(error);
     }
-    return message;
-  } catch (error) {
-    console.error(error);
-  }
-};
-
+  };
 ```
 
-```
-// client/lib/sendbird.js
+Let's get our decryptMessage method from our hook and pass it to a CustomMessage component
 
-channelHandler.onMessageReceived = async (channel, message) => {
-  const { selectedChannel } = state;
-  if (selectedChannel && channel.url === selectedChannel.url) {
-    const decryptedMessage = await decryptMessage(channel, message);
-    decryptedMessage &&
-      dispatch({
-      type: actionTypes.ADD_MESSAGE,
-      payload: { message: decryptedMessage },
-    });
+```
+...
+const CustomChannel = ({ sdk, currentChannel, setShowSettings }) => {
+  const userId = sdk?.currentUser?.userId;
+  const { encryptMessage, decryptMessage } = useE3({ userId });
+
+  ...
+
+  return (
+        <Channel
+          channelUrl={currentChannel?.url}
+          onChatHeaderActionClick={onChatHeaderActionClick}
+          renderChatItem={({ message, onDeleteMessage, onUpdateMessage }) => {
+            return (
+              <CustomMessage
+                message={message}
+                onDeleteMessage={onDeleteMessage}
+                onUpdateMessage={onUpdateMessage}
+                decryptMessage={(message) =>
+                  decryptMessage(currentChannel, message)
+                }
+              ></CustomMessage>
+            );
+          }}
+          renderMessageInput={({ channel, user, disabled }) => (
+            <CustomMessageInput
+              channel={channel}
+              disabled={disabled}
+              encryptMessage={encryptMessage}
+            />
+          )}
+        />
+      );
+
+  ...
+```
+
+For encrypted messages our CustomMessage component will display a placeholder while the message is decrypted asynchronously and then will display the message content once complete.
+
+```
+// javascript-sample/src/CustomMessage.js
+
+import React, { useState } from 'react';
+
+import CardContent from '@material-ui/core/CardContent';
+import CardMedia from '@material-ui/core/CardMedia';
+import Typography from '@material-ui/core/Typography';
+import Paper from '@material-ui/core/Paper';
+import Link from '@material-ui/core/Link';
+
+const CustomMessage = ({
+  message,
+  decryptMessage,
+  onDeleteMessage,
+  onUpdateMessage,
+}) => {
+  const [decryptedMessage, setDecryptedMessage] = useState('');
+
+  if (message.message && message.data) {
+    const data = JSON.parse(message.data);
+    if (data.isEncrypted) {
+      decryptMessage(message).then((decryptedMessage) => {
+        if (decryptedMessage) {
+          setDecryptedMessage(decryptedMessage);
+        }
+      });
+    }
   }
+
+  return (
+    <Paper style={{ display: 'flex' }}>
+      <CardMedia
+        image={message.sender && message.sender.profileUrl}
+        style={{ width: 50, height: 50, marginTop: 25 }}
+      />
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        <CardContent
+          style={{ flex: '1 0 auto', minWidth: 180, textAlign: 'left' }}
+        >
+          <Typography variant='body1' noWrap style={{ width: 360 }}>
+            {message.messageType === 'file' ? (
+              <Link
+                target='_blank'
+                rel='noreferrer'
+                variant='body2'
+                href={message.url}
+              >
+                {message.name}
+              </Link>
+            ) : (
+              `${decryptedMessage || 'ENCRYPTED MESSAGE'}`
+            )}
+          </Typography>
+          <Typography variant='caption' color='textSecondary'>
+            {new Date(message.createdAt).toDateString()}
+            {` by
+                ${
+                  message.messageType === 'admin'
+                    ? 'Channel Admin'
+                    : message.sender && message.sender.userId
+                }
+              `}
+          </Typography>
+        </CardContent>
+      </div>
+    </Paper>
+  );
 };
+
+export default CustomMessage;
 ```
 
 ### Next Steps
+
 This tutorial doesn't include all the functionality needed for a production app. Some of the next items you would want to add are:
 
 - Backup and recover lost keys
+  - This is needed for users that are already registerd that need to add their key to a new device or to backup and recover a lost key
+- Decrypt last message field in the channel list preview
+  - The Sendbird channel object shows the most recent message as a preview in the channel list. If this is a text message, this could be decrypted to display the preview to the user
 - Add a user to a channel
+  - When a user is added to a Sendbird group channel they should also be added to the Virgil group that corresponds to the channel in order to send and read messages in the channel.
 - Remove a user from a channel
+  - When a user is removed from a Sendbird group channel they lose the ability to retrieve the encrypted messages. If, however, they still had these cached locally they would be able to decrypt these messages unless they were also removed from the Virgil group that corresponds the Sendbird group channel.
