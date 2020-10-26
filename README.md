@@ -1,8 +1,6 @@
 ## How to run
 
-Run the server and a client sample
-
-The server can be found in the server directory.
+Run the [server](https://github.com/AlexOrrSB/sendbird-virgil-uikit-sample/tree/master/server) and a client sample
 
 The samples require the server to be running for a user to connect.
 
