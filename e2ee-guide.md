@@ -725,11 +725,11 @@ export default CustomMessage;
 
 This tutorial doesn't include all the functionality needed for a production app. Some of the next items you would want to add are:
 
-- Backup and recover lost keys
-  - This is needed for users that are already registerd that need to add their key to a new device or to backup and recover a lost key
+- [Backup and recover lost keys](https://developer.virgilsecurity.com/docs/e3kit/key-backup/) 
+  - This is needed for users that are already registered who need to add their key to a new device or to backup and recover a lost key
 - Decrypt last message field in the channel list preview
-  - The Sendbird channel object shows the most recent message as a preview in the channel list. If this is a text message, this could be decrypted to display the preview to the user
+  - The Sendbird [channel object](https://docs.sendbird.com/platform/group_channel#_4_resource_representation) shows the most recent message as a preview in the channel list. If this is a text message, this could be decrypted to display the preview to the user
 - Add a user to a channel
-  - When a user is added to a Sendbird group channel they should also be added to the Virgil group that corresponds to the channel in order to send and read messages in the channel.
+  - When a user is [added to a Sendbird group channel](https://docs.sendbird.com/platform/group_channel#3_invite_as_members) they should also be [added to the Virgil group](https://developer.virgilsecurity.com/docs/e3kit/end-to-end-encryption/group-chat/#add-new-participant) that corresponds to the channel in order to send and read messages in the channel.
 - Remove a user from a channel
-  - When a user is removed from a Sendbird group channel they lose the ability to retrieve the encrypted messages. If, however, they still had these cached locally they would be able to decrypt these messages unless they were also removed from the Virgil group that corresponds the Sendbird group channel.
+  - When a [user is removed from a Sendbird group channel](https://docs.sendbird.com/platform/group_channel#3_leave_a_channel) they lose the ability to retrieve the encrypted messages. If, however, they still had these cached locally they would be able to decrypt these messages unless they were also [removed from the Virgil group](https://developer.virgilsecurity.com/docs/e3kit/end-to-end-encryption/group-chat/#remove-participant) that corresponds the Sendbird group channel.
