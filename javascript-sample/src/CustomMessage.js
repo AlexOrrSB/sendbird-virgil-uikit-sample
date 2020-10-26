@@ -5,9 +5,6 @@ import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import Link from '@material-ui/core/Link';
-// import Input from '@material-ui/core/Input';
-// import Button from '@material-ui/core/Button';
-// import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 
 const CustomMessage = ({
   message,
@@ -68,31 +65,6 @@ const CustomMessage = ({
               `}
           </Typography>
         </CardContent>
-        {/*  Uncomment to implement delete and update features */}
-        {/* <div className={{
-          display: 'flex',
-          alignItems: 'center',
-        }}>
-          <DeleteOutlineIcon
-            onClick={() => {
-              const onDeleteCb = (error, success) => { console.warn(error, success); }
-              onDeleteMessage(message, onDeleteCb);
-            }}
-          >
-          </DeleteOutlineIcon>
-        </div> */}
-        {/* Uncomment to update message*/}
-        {/* <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            const updatedText = e.target.updatedText.value;
-            const onUpdateCb = () => { console.warn('message updated'); }
-            onUpdateMessage(message.messageId, updatedText, onUpdateCb);
-          }}
-        >
-          <Input name="updatedText" />
-          <Button type="submit">Update</Button>
-        </form> */}
       </div>
     </Paper>
   );
