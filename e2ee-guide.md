@@ -22,7 +22,7 @@ According to Virgil's website:
 
 ### Create users in the Sendbird dashboard
 
-Create users in the Sendbird dashboard in the `users` section. Issue the new user's an access token so that they can only connect the Sendbird client SDK if they first retrieve the access token. This is a best practice and although unsecured in this tutorial, the endpoint to retrieve the Sendbird access token can be behind your own application's authentication.
+Create users in the Sendbird dashboard in the `users` section. Issue the new users an access token so that they can only connect the Sendbird client SDK if they first retrieve the access token. This is a best practice and although unsecured in this tutorial, the endpoint to retrieve the Sendbird access token can be behind your own application's authentication.
 
 ### Create a Virgil Account
 
