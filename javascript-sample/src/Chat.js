@@ -8,6 +8,7 @@ import 'sendbird-uikit/dist/index.css';
 
 import CustomChannel from './CustomChannel';
 import CustomChannelList from './CustomChannelList';
+import { useE3 } from './utils/e3';
 
 const Chat = ({ userId, accessToken, nickname, theme }) => {
   const history = useHistory();
@@ -18,6 +19,7 @@ const Chat = ({ userId, accessToken, nickname, theme }) => {
   }, [userId, nickname, history]);
   const [showSettings, setShowSettings] = useState(false);
   const [currentChannel, setCurrentChannel] = useState(null);
+  const { registerUser } = useE3({ userId });
 
   return (
     <div style={{ height: '100vh' }}>
@@ -50,6 +52,7 @@ const Chat = ({ userId, accessToken, nickname, theme }) => {
           </div>
         )}
       </SendBirdProvider>
+      <button onClick={registerUser}>Register User With Virgil</button>
     </div>
   );
 };

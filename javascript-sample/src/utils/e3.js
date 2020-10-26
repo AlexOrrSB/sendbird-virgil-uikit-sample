@@ -111,6 +111,7 @@ export const E3Provider = ({ children }) => {
       value={{
         isInitialized,
         setUserId,
+        registerUser,
         encryptMessage,
         decryptMessage,
         decryptMessages,
@@ -126,6 +127,7 @@ export const useE3 = ({ userId }) => {
   const {
     isInitialized,
     setUserId,
+    registerUser,
     encryptMessage,
     decryptMessage,
     decryptMessages,
@@ -138,6 +140,7 @@ export const useE3 = ({ userId }) => {
 
   return {
     isInitialized,
+    registerUser,
     encryptMessage,
     decryptMessage,
     decryptMessages,
