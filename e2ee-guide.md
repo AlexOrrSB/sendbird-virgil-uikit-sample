@@ -603,6 +603,8 @@ const _decryptMessage = async (message, group) => {
 Let's get our decryptMessage method from our hook and pass it to a CustomMessage component
 
 ```
+// javascript-sample/src/CustomMessage.js
+
 ...
 const CustomChannel = ({ sdk, currentChannel, setShowSettings }) => {
   const userId = sdk?.currentUser?.userId;
