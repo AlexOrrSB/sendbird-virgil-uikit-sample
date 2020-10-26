@@ -8,5 +8,4 @@ The samples require the server to be running for a user to connect.
 
 Client samples
 
-- JavaScript
-  - In the javascript-sample directory
+- [JavaScript](https://github.com/AlexOrrSB/sendbird-virgil-uikit-sample/tree/master/javascript-sample)
