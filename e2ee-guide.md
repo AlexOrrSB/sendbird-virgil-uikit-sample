@@ -3,10 +3,10 @@
 ## Overview
 
 ### What is end-to-end encrypt
+
 End-to-end encryption is a system of communication in which only the users communicating are capable of reading the messages being transmitted. In the context of SendBird, end-to-end encryption means that SendBird systems and personnel are unable to access the message content. All communications in SendBird are encrypted at the transport level while in motion and at the persistence level when at rest.
 
 This adds an additional level of encryption at the message payload level such that ciphertext is transmitted, stored and retrieved. Only users with access to the private key used to encrypt the data are able to read the contents. End-to-end encryption is a powerful tool for enhancing the privacy guarantees of SendBird messaging and is often a requirement in regulated industries with compliance requirements on data accessibility. More information can be found here.
-
 
 ### Why use Virgil's E3Kit with Sendbird
 
@@ -16,7 +16,6 @@ According to Virgil's website:
 > - **Complete end-to-end encryption**: User's data is always encrypted and protected - at rest and in transit.
 > - **Independent data protection**: With E3Kit your data protection doesn't rely on any network and service providers, so any attacks on them won't influence the data integrity and confidentiality.
 > - **Data integrity**: The E3Kit signs and verifies data as part of the encrypt and decrypt functions. This confirms that data is actually coming from the user who encrypted it and that it hasn't been tampered with in transit or storage.
-
 
 ## Examples
 
@@ -306,7 +305,7 @@ When a user is created with Sendbird a client needs to register with Virgil. Thi
 
 #### JavaScript
 
-Since we are creating our Sendbird users using the dashboard there is not a client side user registration flow to trigger this action. If you have a signup flow, it is best to register a user then. For simplicity you can simply create a button to manually call this method for any users that haven't been registered with Virgil. All users will need to be registered with Virgil before they can be added to group channels, send messages, or read messages. 
+Since we are creating our Sendbird users using the dashboard there is not a client side user registration flow to trigger this action. If you have a signup flow, it is best to register a user then. For simplicity you can simply create a button to manually call this method for any users that haven't been registered with Virgil. All users will need to be registered with Virgil before they can be added to group channels, send messages, or read messages.
 
 ```
 // javascript-sample/src/utils/e3.js
@@ -317,6 +316,24 @@ const registerUser = async () => {
   } catch (error) {
     console.error(error)
   }
+}
+```
+
+Register users if they were created in the Sendbird dashboard, but haven't been registered with Virgil. This is only required once per user. In a production application this would be part of your user signup flow and backing up / restoring your key would allow you to retrieve an existing key for already registered users.
+```
+// javascript-sample/src/Chat.js
+import { useE3 } from './utils/e3';
+
+const Chat = ({ userId, accessToken, nickname, theme }) => {
+    const { registerUser } = useE3({ userId });
+
+    ...
+
+    return (
+      ...
+      <button onClick={registerUser}>Register User With Virgil</button>
+      ...
+    )
 }
 ```
 
@@ -427,6 +444,7 @@ const loadGroup = async (channel) => {
   }
 };
 ```
+
 We will add a custom message input in our channel component so that we can first encrypt the message prior to sending. We will do this with the renderMessageInput prop of our CustomChannel component and a CustomMessageInput component.
 
 ```
@@ -455,6 +473,7 @@ const CustomChannel = ({ sdk, currentChannel, setShowSettings }) => {
 
   ...
 ```
+
 The CustomMesssageInput component will encrypt text messages prior to sending them.
 
 ```
@@ -499,7 +518,7 @@ function CustomMessageInput({
   const handleChange = (event) => {
     setInputText(event.target.value);
   };
-  
+
   ...
 
   const sendUserMessage_ = (event) => {
@@ -561,7 +580,7 @@ export default withSendBird(CustomMessageInput, mapStoreToProps);
 
 ### Decrypt messages in an existing group channel
 
-Members of a channel need to decrypt messages before they can read them. Virgil's group encryption will handle this if the user is part of the Virgil Group. 
+Members of a channel need to decrypt messages before they can read them. Virgil's group encryption will handle this if the user is part of the Virgil Group.
 
 #### JavaScript
 
@@ -733,7 +752,7 @@ export default CustomMessage;
 
 This tutorial doesn't include all the functionality needed for a production app. Some of the next items you would want to add are:
 
-- [Backup and recover lost keys](https://developer.virgilsecurity.com/docs/e3kit/key-backup/) 
+- [Backup and recover lost keys](https://developer.virgilsecurity.com/docs/e3kit/key-backup/)
   - This is needed for users that are already registered who need to add their key to a new device or to backup and recover a lost key
 - Decrypt last message field in the channel list preview
   - The Sendbird [channel object](https://docs.sendbird.com/platform/group_channel#_4_resource_representation) shows the most recent message as a preview in the channel list. If this is a text message, this could be decrypted to display the preview to the user
