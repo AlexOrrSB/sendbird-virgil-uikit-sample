@@ -41,7 +41,7 @@ Create users in the Sendbird dashboard in the `users` section. Issue the new use
 
 Add your `SENDBIRD_APP_ID`, `SENDBIRD_API_TOKEN`, `VIRGIL_APP_ID`, `VIRGIL_APP_KEY`, `VIRGIL_APP_KEY_ID` to your .env file
 
-### Set up your Server
+### Set up your server
 
 You will need a server to retrieve Sendbird access tokens and Virgil JWTs. In this example we'll set up a simple Express server.
 
