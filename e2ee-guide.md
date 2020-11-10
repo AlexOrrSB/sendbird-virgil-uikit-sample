@@ -311,11 +311,7 @@ Since we are creating our Sendbird users using the dashboard there is not a clie
 // javascript-sample/src/utils/e3.js
 
 const registerUser = async () => {
-  try {
-    e3.register()
-  } catch (error) {
-    console.error(error)
-  }
+  e3.register()
 }
 ```
 
@@ -343,36 +339,29 @@ When a Sendbird group channel is created we need to create a corresponding Virgi
 
 #### JavaScript
 
+Add methods to create Virgil groups. We will make the groupId the Sendbird channel url and the participant identities their Sendbird user ids.
+
 ```
 // javascript-sample/src/utils/e3.js
 
 const createGroup = async (groupId, participantIdentities) => {
-  try {
-    const participants = await e3.findUsers(participantIdentities);
-    await e3.createGroup(groupId, participants);
-  } catch (error) {
-    console.error(error);
-  }
+  const participants = await e3.findUsers(participantIdentities);
+  await e3.createGroup(groupId, participants);
 };
 
 const loadGroup = async (channel) => {
-  try {
-    const { ownerId, groupId } = JSON.parse(channel.data);
-    const ownerCard = await e3.findUsers(ownerId);
-    return await e3.loadGroup(groupId, ownerCard);
-  } catch (error) {
-    console.error(error);
-    }
+  const { ownerId, groupId } = JSON.parse(channel.data);
+  const ownerCard = await e3.findUsers(ownerId);
+  return await e3.loadGroup(groupId, ownerCard);
 };
 ```
+
+We can make a custom channel list component in order to create a Virgil group when creating a Sendbird group channel.
 
 ```
 // javascript-sample/src/CustomChannelList.js
 
-import React from 'react';
-import { ChannelList, sendBirdSelectors, withSendBird } from 'sendbird-uikit';
-import cuid from 'cuid';
-import { useE3 } from './utils/e3';
+...
 
 const CustomChannelList = ({ sdk, setCurrentChannel }) => {
   const userId = sdk?.currentUser?.userId;
@@ -427,21 +416,13 @@ We will add some helpers to our Virgil hook to support encrypting messages. Sinc
 // javascript-sample/src/utils/e3.js
 
 export const encryptMessage = async (channel, message) => {
-  try {
-    const group = await loadGroup(channel);
-    return await group.encrypt(message);
-  } catch (error) {
-    console.error(error);
-  }
+  const group = await loadGroup(channel);
+  return await group.encrypt(message);
 };
 
 const loadGroup = async (channel) => {
-  try {
-    const ownerCard = await e3.findUsers(channel.data);
-    return await e3.loadGroup(channel.url, ownerCard);
-  } catch (error) {
-    console.error(error);
-  }
+  const ownerCard = await e3.findUsers(channel.data);
+  return await e3.loadGroup(channel.url, ownerCard);
 };
 ```
 
@@ -479,26 +460,7 @@ The CustomMesssageInput component will encrypt text messages prior to sending th
 ```
 // javascript-sample/src/CustomMessageInput.js
 
-import React, { useState } from 'react';
-import { sendBirdSelectors, withSendBird } from 'sendbird-uikit';
-import {
-  InputAdornment,
-  IconButton,
-  FormControl,
-  InputLabel,
-  OutlinedInput,
-} from '@material-ui/core';
-import {
-  AttachFile as AttachFileIcon,
-  Send as SendIcon,
-} from '@material-ui/icons';
-import { makeStyles } from '@material-ui/styles';
-
-const useStyles = makeStyles({
-  input: {
-    display: 'none',
-  },
-});
+...
 
 function CustomMessageInput({
   channel,
@@ -508,7 +470,8 @@ function CustomMessageInput({
   sendFileMessage,
   sdk,
 }) {
-  const classes = useStyles();
+
+  ...
 
   // state
   const [inputText, setInputText] = useState('');
@@ -584,25 +547,21 @@ Members of a channel need to decrypt messages before they can read them. Virgil'
 
 #### JavaScript
 
-We can add some more helper functions to our Virgil hook for decrypting messages
+We can add some more helper functions to our Virgil hook for decrypting messages. If your implementation decrypts messages upon loading you can decrypt them all at once, but regardless everything will be handled by the private _decryptMessage function. In this implementation, messages are decrypted when they are rendered so they are handled one by one. That way the same behavior exists whether decrypting one or many messages for a channel.
 
 ```
 // javascript-sample/src/utils/e3.js
 
 const _decryptMessage = async (message, group) => {
-    try {
-      if (message.messageType === 'user' && message.sender) {
-        const senderCart = await e3.findUsers(message.sender.userId);
-        const decryptedMessage = await group.decrypt(
-          message.message,
-          senderCart,
-        );
-        return decryptedMessage;
-      }
-      return;
-    } catch (error) {
-      console.error(error);
-    }
+  if (message.messageType === 'user' && message.sender) {
+    const senderCart = await e3.findUsers(message.sender.userId);
+    const decryptedMessage = await group.decrypt(
+      message.message,
+      senderCart,
+    );
+    return decryptedMessage;
+  }
+  return;
   };
 
   const decryptMessage = async (channel, message) => {
@@ -627,7 +586,7 @@ const _decryptMessage = async (message, group) => {
   };
 ```
 
-Let's get our decryptMessage method from our hook and pass it to a CustomMessage component
+Let's get our decryptMessage method from our hook and pass it to a CustomMessage component so that the message can be decrypted when it is rendered.
 
 ```
 // javascript-sample/src/CustomMessage.js
@@ -673,13 +632,7 @@ For encrypted messages our CustomMessage component will display a placeholder wh
 ```
 // javascript-sample/src/CustomMessage.js
 
-import React, { useState } from 'react';
-
-import CardContent from '@material-ui/core/CardContent';
-import CardMedia from '@material-ui/core/CardMedia';
-import Typography from '@material-ui/core/Typography';
-import Paper from '@material-ui/core/Paper';
-import Link from '@material-ui/core/Link';
+...
 
 const CustomMessage = ({
   message,
