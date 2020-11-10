@@ -2,7 +2,7 @@
 
 ## Overview
 
-### What is end-to-end encrypt
+### What is end-to-end encryption
 
 End-to-end encryption is a system of communication in which only the users communicating are capable of reading the messages being transmitted. In the context of SendBird, end-to-end encryption means that SendBird systems and personnel are unable to access the message content. All communications in SendBird are encrypted at the transport level while in motion and at the persistence level when at rest.
 
