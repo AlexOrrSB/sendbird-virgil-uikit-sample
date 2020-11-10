@@ -191,7 +191,7 @@ Follow the steps in the [Virgil documentation](https://developer.virgilsecurity.
 
 #### JavaScript
 
-For convenience we will create a hook for all the Virgil functionality. This way we can initialize the Virgil SDK once when the user connects, and then use helper functions to easily perform Vigil actions from our chat components.
+For convenience we will create a hook for all the Virgil functionality. This way we can initialize the Virgil SDK once when the user connects, and then use helper functions to easily perform Vigil actions from our chat components. To start we will just have functions to retrieve the Virgil SDK token from our server and initialize the Virgil e3 SDK. We will add all of the encryption / decryption functionality to this as we move along.
 
 ```
 // javascript-sample/src/utils/e3.js
@@ -262,13 +262,7 @@ Let's add the Virgil provider to our app. This makes our Virgil hook accessible 
 ```
 // javascript-sample/src/index.js
 
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
-import { SendbirdProvider } from './utils/sendbird';
-import { E3Provider } from './utils/e3';
+...
 
 ReactDOM.render(
   <React.StrictMode>
@@ -356,7 +350,7 @@ const loadGroup = async (channel) => {
 };
 ```
 
-We can make a custom channel list component in order to create a Virgil group when creating a Sendbird group channel.
+We can make a custom channel list component in order to create a Virgil group when creating a Sendbird group channel. We need to map the Sendbird UIKit's state to our component's props in order to get the current userId.
 
 ```
 // javascript-sample/src/CustomChannelList.js
