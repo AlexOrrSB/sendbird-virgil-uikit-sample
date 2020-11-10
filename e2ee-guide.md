@@ -41,7 +41,9 @@ Create users in the Sendbird dashboard in the `users` section. Issue the new use
 
 Add your `SENDBIRD_APP_ID`, `SENDBIRD_API_TOKEN`, `VIRGIL_APP_ID`, `VIRGIL_APP_KEY`, `VIRGIL_APP_KEY_ID` to your .env file
 
-### Set up an Express server
+### Set up your Server
+
+You will need a server to retrieve Sendbird access tokens and Virgil JWTs. In this example we'll set up a simple Express server.
 
 ```
 // server/index.js
@@ -303,6 +305,7 @@ Since we are creating our Sendbird users using the dashboard there is not a clie
 
 ```
 // javascript-sample/src/utils/e3.js
+...
 
 const registerUser = async () => {
   e3.register()
@@ -648,47 +651,37 @@ const CustomMessage = ({
   }
 
   return (
-    <Paper style={{ display: 'flex' }}>
-      <CardMedia
-        image={message.sender && message.sender.profileUrl}
-        style={{ width: 50, height: 50, marginTop: 25 }}
-      />
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
-        <CardContent
-          style={{ flex: '1 0 auto', minWidth: 180, textAlign: 'left' }}
-        >
-          <Typography variant='body1' noWrap style={{ width: 360 }}>
-            {message.messageType === 'file' ? (
-              <Link
-                target='_blank'
-                rel='noreferrer'
-                variant='body2'
-                href={message.url}
-              >
-                {message.name}
-              </Link>
-            ) : (
-              `${decryptedMessage || 'ENCRYPTED MESSAGE'}`
-            )}
-          </Typography>
-          <Typography variant='caption' color='textSecondary'>
-            {new Date(message.createdAt).toDateString()}
-            {` by
-                ${
-                  message.messageType === 'admin'
-                    ? 'Channel Admin'
-                    : message.sender && message.sender.userId
-                }
-              `}
-          </Typography>
-        </CardContent>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <div style={{ width: 360 }}>
+        {message.messageType === 'file' ? (
+          <Link
+            target='_blank'
+            rel='noreferrer'
+            variant='body2'
+            href={message.url}
+          >
+            {message.name}
+          </Link>
+        ) : (
+          `${decryptedMessage || 'ENCRYPTED MESSAGE'}`
+        )}
       </div>
-    </Paper>
+      <div>
+        {new Date(message.createdAt).toDateString()}
+        {` by
+            ${
+              message.messageType === 'admin'
+                ? 'Channel Admin'
+                : message.sender && message.sender.userId
+            }
+          `}
+      </div>
+    </div>
   );
 };
 
