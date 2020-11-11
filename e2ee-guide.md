@@ -97,16 +97,12 @@ const getUser = async (userId) => {
 };
 
 sendbirdRouter.get('/accessToken/:userId', async (req, res) => {
-  try {
-    const { params } = req;
-    const { userId } = params;
+  const { params } = req;
+  const { userId } = params;
 
-    const user = await getUser(userId);
-    const accessToken = user.access_token;
-    res.status(200).json({ accessToken });
-  } catch (error) {
-    res.status(500).json({ error });
-  }
+  const user = await getUser(userId);
+  const accessToken = user.access_token;
+  res.status(200).json({ accessToken });
 });
 
 module.exports = { sendbirdRouter, getUser };
@@ -224,13 +220,9 @@ export const E3Provider = ({ children }) => {
   };
 
   const initE3 = async (userId) => {
-    try {
-      const e3 = await EThree.initialize(() => getVirgilToken(userId));
-      setE3(e3);
-      setIsInitialized(true);
-    } catch (error) {
-      console.error(error);
-    }
+    const e3 = await EThree.initialize(() => getVirgilToken(userId));
+    setE3(e3);
+    setIsInitialized(true);
   };
 
   return (
@@ -313,6 +305,7 @@ const registerUser = async () => {
 ```
 
 Register users if they were created in the Sendbird dashboard, but haven't been registered with Virgil. This is only required once per user. In a production application this would be part of your user signup flow and backing up / restoring your key would allow you to retrieve an existing key for already registered users.
+
 ```
 // javascript-sample/src/Chat.js
 import { useE3 } from './utils/e3';
@@ -544,7 +537,7 @@ Members of a channel need to decrypt messages before they can read them. Virgil'
 
 #### JavaScript
 
-We can add some more helper functions to our Virgil hook for decrypting messages. If your implementation decrypts messages upon loading you can decrypt them all at once, but regardless everything will be handled by the private _decryptMessage function. In this implementation, messages are decrypted when they are rendered so they are handled one by one. That way the same behavior exists whether decrypting one or many messages for a channel.
+We can add some more helper functions to our Virgil hook for decrypting messages. If your implementation decrypts messages upon loading you can decrypt them all at once, but regardless everything will be handled by the private \_decryptMessage function. In this implementation, messages are decrypted when they are rendered so they are handled one by one. That way the same behavior exists whether decrypting one or many messages for a channel.
 
 ```
 // javascript-sample/src/utils/e3.js
@@ -567,19 +560,15 @@ const _decryptMessage = async (message, group) => {
   };
 
   const decryptMessages = async (channel, messages) => {
-    try {
-      const group = await loadGroup(channel);
+    const group = await loadGroup(channel);
 
-      const decryptedMessagesPromises = messages.map((message) => {
-        return _decryptMessage(message, group).then((decryptedMessage) => {
-          return decryptedMessage;
-        });
+    const decryptedMessagesPromises = messages.map((message) => {
+      return _decryptMessage(message, group).then((decryptedMessage) => {
+        return decryptedMessage;
       });
+    });
 
-      return Promise.all(decryptedMessagesPromises);
-    } catch (error) {
-      console.error(error);
-    }
+    return Promise.all(decryptedMessagesPromises);
   };
 ```
 
