@@ -5,7 +5,7 @@ const appId = process.env.SENDBIRD_APP_ID;
 const apiToken = process.env.SENDBIRD_API_TOKEN;
 const sendbirdBaseUrl = `https://api-${appId}.sendbird.com`;
 const headers = {
-  'Content-Type': 'Aaplication/json',
+  'Content-Type': 'application/json',
   'Api-Token': apiToken,
 };
 
