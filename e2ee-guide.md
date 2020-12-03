@@ -10,6 +10,8 @@ This adds an additional level of encryption at the message payload level such th
 
 ### Why use Virgil's E3Kit with Sendbird
 
+Virgil offers SDKs for many platforms and their own service that makes encryption, key management, and other difficult tasks simple. This avoids the needing to re-invent the wheel an implement these actions yourself.
+
 According to Virgil's website:
 
 > - **Full Security**: Full privacy: Only user can read their own messages; Sendbird, Virgil and other third-party services cannot decrypt and access messages and data.
