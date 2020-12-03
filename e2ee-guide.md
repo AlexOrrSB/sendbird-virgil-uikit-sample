@@ -6,7 +6,7 @@
 
 End-to-end encryption is a system of communication in which only the users communicating are capable of reading the messages being transmitted. In the context of SendBird, end-to-end encryption means that SendBird systems and personnel are unable to access the message content. All communications in SendBird are encrypted at the transport level while in motion and at the persistence level when at rest.
 
-This adds an additional level of encryption at the message payload level such that ciphertext is transmitted, stored and retrieved. Only users with access to the private key used to encrypt the data are able to read the contents. End-to-end encryption is a powerful tool for enhancing the privacy guarantees of SendBird messaging and is often a requirement in regulated industries with compliance requirements on data accessibility. More information can be found here.
+This adds an additional level of encryption at the message payload level such that ciphertext is transmitted, stored and retrieved. Only users with access to the private key used to encrypt the data are able to read the contents. End-to-end encryption is a powerful tool for enhancing the privacy guarantees of SendBird messaging and is often a requirement in regulated industries with compliance requirements on data accessibility. More information can be found [here](https://ssd.eff.org/en/module/deep-dive-end-end-encryption-how-do-public-key-encryption-systems-work) and [here](https://en.wikipedia.org/wiki/End-to-end_encryption).
 
 ### Why use Virgil's E3Kit with Sendbird
 
